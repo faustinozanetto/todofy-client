@@ -9,10 +9,16 @@ import { __backendUri__ } from '../utils/constants';
 const Home = () => {
   const [loading, setLoading] = useState(true);
 
+  var headers = new Headers();
+  headers.append('Content-Type', 'application/json');
+  headers.append('Accept', 'application/json');
+
   useEffect(() => {
     fetch(__backendUri__ + '/refresh_token', {
       method: 'POST',
       credentials: 'include',
+      headers: headers,
+      mode: 'cors',
     }).then(async (res) => {
       const { accessToken } = await res.json();
       setAccessToken(accessToken);
