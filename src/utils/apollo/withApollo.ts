@@ -5,7 +5,10 @@ import { __backendUri__ } from '../constants';
 
 const createClient = (ctx: NextPageContext) =>
   new ApolloClient({
-    uri: __backendUri__ as string,
+    uri:
+      process.env.NODE_ENV === 'production'
+        ? 'https://todofy-backend.herokuapp.com/graphql'
+        : 'http://localhost:4000/graphql',
     credentials: 'include',
     headers: {
       cookie:
