@@ -1,0 +1,5 @@
+mutation register($input: UserCredentialsInput!) {
+  register(input: $input) {
+    ...NormalUserResponse
+  }
+}
