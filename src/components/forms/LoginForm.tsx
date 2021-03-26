@@ -47,14 +47,10 @@ export const LoginForm: React.FC<ILoginForm> = ({}) => {
           const response = await login({
             variables: values,
             update: (store, { data }) => {
-              if (!data) {
-                return null;
-              }
-
               store.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
-                  me: data.login.user,
+                  me: data?.login.user,
                 },
               });
             },
