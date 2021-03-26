@@ -13,6 +13,7 @@ const Home = () => {
   headers.append('Content-Type', 'application/json');
   headers.append('Accept', 'application/json');
 
+  /*
   useEffect(() => {
     fetch(__backendUri__ + '/refresh_token', {
       method: 'POST',
@@ -33,6 +34,7 @@ const Home = () => {
       </Box>
     );
   }
+  */
   return (
     <AppLayout>
       <SEO
