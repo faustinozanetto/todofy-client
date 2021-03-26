@@ -1,14 +1,16 @@
+import { Box, Heading } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { SEO } from '../components/seo';
 import { AppLayout } from '../layout';
 import { setAccessToken } from '../utils/accessToken';
 import { withApollo } from '../utils/apollo/withApollo';
+import { __backendUri__ } from '../utils/constants';
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:4000/refresh_token', {
+    fetch(__backendUri__! + '/refresh_token', {
       method: 'POST',
       credentials: 'include',
     }).then(async (res) => {
@@ -17,9 +19,13 @@ const Home = () => {
       setLoading(false);
     });
   }, []);
-  
+
   if (loading) {
-    return <div>loading...</div>;
+    return (
+      <Box>
+        <Heading>Fetching data, please wait...</Heading>
+      </Box>
+    );
   }
   return (
     <AppLayout>
