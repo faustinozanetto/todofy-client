@@ -2,7 +2,7 @@ fragment NormalUsersResponse on UsersResponse {
   errors {
     ...NormalError
   }
-  foundUsers {
+  users {
     ...NormalUser
   }
 }

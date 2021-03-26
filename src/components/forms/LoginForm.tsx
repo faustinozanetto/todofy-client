@@ -7,6 +7,7 @@ import { Button, useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { toErrorMap } from '../../utils';
 import { useLoginMutation, MeQuery, MeDocument } from '../../generated/graphql';
+import { setAccessToken } from '../../utils/accessToken';
 
 interface ILoginForm {}
 
@@ -45,16 +46,23 @@ export const LoginForm: React.FC<ILoginForm> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login({
             variables: values,
-            update: (cache, { data }) => {
-              cache.writeQuery<MeQuery>({
+            update: (store, { data }) => {
+              if (!data) {
+                return null;
+              }
+
+              store.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
-                  __typename: 'Query',
-                  me: data?.login.user,
+                  me: data.login.user,
                 },
               });
             },
           });
+          console.log(response);
+          if (response && response.data) {
+            setAccessToken(response.data.login.accessToken!);
+          }
           const errors = response.data?.login.errors;
           if (errors) {
             setErrors(toErrorMap(errors));
