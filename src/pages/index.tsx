@@ -10,7 +10,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(__backendUri__! + '/refresh_token', {
+    fetch(__backendUri__ + '/refresh_token', {
       method: 'POST',
       credentials: 'include',
     }).then(async (res) => {
