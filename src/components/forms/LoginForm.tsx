@@ -51,7 +51,7 @@ export const LoginForm: React.FC<ILoginForm> = ({}) => {
             variables: values,
             update: (store, { data }) => {
               if (!data) {
-                return null;
+                return;
               }
 
               store.writeQuery<MeQuery>({
