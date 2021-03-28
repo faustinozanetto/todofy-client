@@ -9,7 +9,6 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { ForgotPasswordForm } from '../../components/forms';
-import { withApollo } from '../../utils/apollo/withApollo';
 
 interface IForgotPassword {}
 
@@ -56,4 +55,4 @@ const ForgotPasswordPage: React.FC<IForgotPassword> = ({}) => {
   );
 };
 
-export default withApollo({ ssr: false })(ForgotPasswordPage);
+export default ForgotPasswordPage;

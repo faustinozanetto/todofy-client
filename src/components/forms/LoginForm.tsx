@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Formik, FormikProps, Form } from 'formik';
 import * as Yup from 'yup';
 import { Box, Spacer, Stack } from '@chakra-ui/layout';
@@ -7,15 +7,14 @@ import { Button, useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { toErrorMap } from '../../utils';
 import { useLoginMutation, MeQuery, MeDocument } from '../../generated/graphql';
-import { setAccessToken } from '../../utils/accessToken';
+import { authContext } from '../user/userContext';
 
-interface ILoginForm {}
-
-interface ILoginFormValues {
+interface ILoginValues {
   username: string;
   password: string;
 }
 
+interface ILoginForm {}
 /**
  * Sign in schema input validation with Yup.
  */
@@ -33,11 +32,14 @@ const signInSchema = Yup.object().shape({
 export const LoginForm: React.FC<ILoginForm> = ({}) => {
   const [login] = useLoginMutation();
   const router = useRouter();
-  const initialValues: ILoginFormValues = {
+  const initialValues: ILoginValues = {
     username: '',
     password: '',
   };
   const toast = useToast();
+
+  const { setAuthData } = useContext(authContext);
+
   return (
     <Box>
       <Formik
@@ -46,18 +48,22 @@ export const LoginForm: React.FC<ILoginForm> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login({
             variables: values,
-            update: (store, { data }) => {
-              store.writeQuery<MeQuery>({
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
+                  __typename: 'Query',
                   me: data?.login.user,
                 },
               });
             },
           });
-          console.log(response);
-          if (response && response.data) {
-            setAccessToken(response.data.login.accessToken!);
+          if (response && response?.data?.login?.user && setAuthData) {
+            try {
+              setAuthData(response.data.login.accessToken!);
+            } catch (error) {
+              console.error(error);
+            }
           }
           const errors = response.data?.login.errors;
           if (errors) {
@@ -82,6 +88,8 @@ export const LoginForm: React.FC<ILoginForm> = ({}) => {
               });
             }
           }
+
+          // loginCall();
         }}
       >
         {(props: FormikProps<ILoginForm>) => {

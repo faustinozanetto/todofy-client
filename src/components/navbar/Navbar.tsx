@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import {
   Box,
   Flex,
@@ -7,6 +7,7 @@ import {
   useDisclosure,
   HStack,
   Button,
+  Heading,
 } from '@chakra-ui/react';
 import { NavbarLink, ThemeTogglerButton } from '.';
 import { NavbarLogo } from './NavbarLogo';
@@ -25,9 +26,39 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     onToggle: hamburgerOnToggle,
   } = useDisclosure();
   const router = useRouter();
-  const { data: userData } = useMeQuery({
-    skip: __isServer__,
-  });
+  const { data: userData, loading } = useMeQuery();
+
+  let userContent: ReactNode = null;
+
+  if (loading) {
+    userContent = <Heading>Loading...</Heading>;
+  } else if (userData && userData.me) {
+    userContent = <UserDetailsMenu userData={userData} />;
+  } else {
+    userContent = (
+      <HStack>
+        <Button
+          variant='outline'
+          colorScheme='teal'
+          onClick={() => {
+            router.push('/user/login');
+          }}
+        >
+          Sign In
+        </Button>
+        <Button
+          variant='outline'
+          colorScheme='teal'
+          onClick={() => {
+            router.push('/user/register');
+          }}
+        >
+          Sign Up
+        </Button>
+      </HStack>
+    );
+  }
+
   return (
     <Box>
       <Flex
@@ -76,30 +107,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
 
           {/* User buttons */}
           <Flex display={['none', 'none', 'flex']} mr={[0, 0, 4]}>
-            {!userData?.me ? (
-              <HStack>
-                <Button
-                  variant='outline'
-                  colorScheme='teal'
-                  onClick={() => {
-                    router.push('/user/login');
-                  }}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant='outline'
-                  colorScheme='teal'
-                  onClick={() => {
-                    router.push('/user/register');
-                  }}
-                >
-                  Sign Up
-                </Button>
-              </HStack>
-            ) : (
-              <UserDetailsMenu userData={userData} />
-            )}
+            {userContent}
           </Flex>
 
           {/* Theme Toggle Button */}

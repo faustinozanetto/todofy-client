@@ -5,4 +5,5 @@ fragment NormalUserResponse on UserResponse {
   user {
     ...NormalUser
   }
+  accessToken
 }

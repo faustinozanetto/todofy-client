@@ -1,9 +1,0 @@
-fragment NormalLoginResponse on LoginResponse {
-  errors {
-    ...NormalError
-  }
-  user {
-    ...NormalUser
-  }
-  accessToken
-}

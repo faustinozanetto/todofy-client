@@ -24,18 +24,12 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
-export type LoginResponse = {
-  __typename?: 'LoginResponse';
-  errors?: Maybe<Array<FieldError>>;
-  user?: Maybe<User>;
-  accessToken?: Maybe<Scalars['String']>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   register: UserResponse;
-  login: LoginResponse;
+  login: UserResponse;
   logout: Scalars['Boolean'];
+  revokeRefreshTokenForUser: Scalars['Boolean'];
   createTodo: TodoResponse;
   deleteTodo: TodoDeleteResponse;
 };
@@ -49,6 +43,10 @@ export type MutationLoginArgs = {
   username: Scalars['String'];
 };
 
+export type MutationRevokeRefreshTokenForUserArgs = {
+  id: Scalars['Int'];
+};
+
 export type MutationCreateTodoArgs = {
   input: TodoCreateInput;
 };
@@ -60,7 +58,8 @@ export type MutationDeleteTodoArgs = {
 export type Query = {
   __typename?: 'Query';
   testString: Scalars['String'];
-  getUsers: UsersResponse;
+  users: UsersResponse;
+  isAuthTest: Scalars['String'];
   me?: Maybe<User>;
   userTodos: TodosResponse;
   todo: TodoResponse;
@@ -133,6 +132,7 @@ export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
   user?: Maybe<User>;
+  accessToken?: Maybe<Scalars['String']>;
 };
 
 export type UsersResponse = {
@@ -141,22 +141,18 @@ export type UsersResponse = {
   users?: Maybe<Array<User>>;
 };
 
-export type NormalLoginResponseFragment = {
-  __typename?: 'LoginResponse';
-} & Pick<LoginResponse, 'accessToken'> & {
-    errors?: Maybe<Array<{ __typename?: 'FieldError' } & NormalErrorFragment>>;
-    user?: Maybe<{ __typename?: 'User' } & NormalUserFragment>;
-  };
-
 export type NormalUserFragment = { __typename?: 'User' } & Pick<
   User,
   'id' | 'username' | 'email'
 >;
 
-export type NormalUserResponseFragment = { __typename?: 'UserResponse' } & {
-  errors?: Maybe<Array<{ __typename?: 'FieldError' } & NormalErrorFragment>>;
-  user?: Maybe<{ __typename?: 'User' } & NormalUserFragment>;
-};
+export type NormalUserResponseFragment = { __typename?: 'UserResponse' } & Pick<
+  UserResponse,
+  'accessToken'
+> & {
+    errors?: Maybe<Array<{ __typename?: 'FieldError' } & NormalErrorFragment>>;
+    user?: Maybe<{ __typename?: 'User' } & NormalUserFragment>;
+  };
 
 export type NormalUsersResponseFragment = { __typename?: 'UsersResponse' } & {
   errors?: Maybe<Array<{ __typename?: 'FieldError' } & NormalErrorFragment>>;
@@ -174,7 +170,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 export type LoginMutation = { __typename?: 'Mutation' } & {
-  login: { __typename?: 'LoginResponse' } & NormalLoginResponseFragment;
+  login: { __typename?: 'UserResponse' } & NormalUserResponseFragment;
 };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
@@ -192,10 +188,23 @@ export type RegisterMutation = { __typename?: 'Mutation' } & {
   register: { __typename?: 'UserResponse' } & NormalUserResponseFragment;
 };
 
+export type IsAuthTestQueryVariables = Exact<{ [key: string]: never }>;
+
+export type IsAuthTestQuery = { __typename?: 'Query' } & Pick<
+  Query,
+  'isAuthTest'
+>;
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { __typename?: 'Query' } & {
   me?: Maybe<{ __typename?: 'User' } & NormalUserFragment>;
+};
+
+export type UsersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UsersQuery = { __typename?: 'Query' } & {
+  users: { __typename?: 'UsersResponse' } & NormalUsersResponseFragment;
 };
 
 export const NormalErrorFragmentDoc = gql`
@@ -211,19 +220,6 @@ export const NormalUserFragmentDoc = gql`
     email
   }
 `;
-export const NormalLoginResponseFragmentDoc = gql`
-  fragment NormalLoginResponse on LoginResponse {
-    errors {
-      ...NormalError
-    }
-    user {
-      ...NormalUser
-    }
-    accessToken
-  }
-  ${NormalErrorFragmentDoc}
-  ${NormalUserFragmentDoc}
-`;
 export const NormalUserResponseFragmentDoc = gql`
   fragment NormalUserResponse on UserResponse {
     errors {
@@ -232,6 +228,7 @@ export const NormalUserResponseFragmentDoc = gql`
     user {
       ...NormalUser
     }
+    accessToken
   }
   ${NormalErrorFragmentDoc}
   ${NormalUserFragmentDoc}
@@ -251,10 +248,10 @@ export const NormalUsersResponseFragmentDoc = gql`
 export const LoginDocument = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
-      ...NormalLoginResponse
+      ...NormalUserResponse
     }
   }
-  ${NormalLoginResponseFragmentDoc}
+  ${NormalUserResponseFragmentDoc}
 `;
 export type LoginMutationFn = Apollo.MutationFunction<
   LoginMutation,
@@ -389,6 +386,59 @@ export type RegisterMutationOptions = Apollo.BaseMutationOptions<
   RegisterMutation,
   RegisterMutationVariables
 >;
+export const IsAuthTestDocument = gql`
+  query isAuthTest {
+    isAuthTest
+  }
+`;
+
+/**
+ * __useIsAuthTestQuery__
+ *
+ * To run a query within a React component, call `useIsAuthTestQuery` and pass it any options that fit your needs.
+ * When your component renders, `useIsAuthTestQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useIsAuthTestQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useIsAuthTestQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    IsAuthTestQuery,
+    IsAuthTestQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<IsAuthTestQuery, IsAuthTestQueryVariables>(
+    IsAuthTestDocument,
+    options
+  );
+}
+export function useIsAuthTestLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    IsAuthTestQuery,
+    IsAuthTestQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<IsAuthTestQuery, IsAuthTestQueryVariables>(
+    IsAuthTestDocument,
+    options
+  );
+}
+export type IsAuthTestQueryHookResult = ReturnType<typeof useIsAuthTestQuery>;
+export type IsAuthTestLazyQueryHookResult = ReturnType<
+  typeof useIsAuthTestLazyQuery
+>;
+export type IsAuthTestQueryResult = Apollo.QueryResult<
+  IsAuthTestQuery,
+  IsAuthTestQueryVariables
+>;
 export const MeDocument = gql`
   query Me {
     me {
@@ -428,3 +478,51 @@ export function useMeLazyQuery(
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const UsersDocument = gql`
+  query users {
+    users {
+      ...NormalUsersResponse
+    }
+  }
+  ${NormalUsersResponseFragmentDoc}
+`;
+
+/**
+ * __useUsersQuery__
+ *
+ * To run a query within a React component, call `useUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UsersQuery, UsersQueryVariables>(
+    UsersDocument,
+    options
+  );
+}
+export function useUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(
+    UsersDocument,
+    options
+  );
+}
+export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
+export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
+export type UsersQueryResult = Apollo.QueryResult<
+  UsersQuery,
+  UsersQueryVariables
+>;

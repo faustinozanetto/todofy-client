@@ -1,48 +1,24 @@
-import { Box, Heading } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import { Heading } from '@chakra-ui/react';
+import React from 'react';
 import { SEO } from '../components/seo';
+import { useUsersQuery } from '../generated/graphql';
 import { AppLayout } from '../layout';
-import { setAccessToken } from '../utils/accessToken';
-import { withApollo } from '../utils/apollo/withApollo';
-import { __backendUri__ } from '../utils/constants';
+import { __backendUri__, __isServer__ } from '../utils/constants';
 
 const Home = () => {
-  const [loading, setLoading] = useState(true);
-
-  var headers = new Headers();
-  headers.append('Content-Type', 'application/json');
-  headers.append('Accept', 'application/json');
-
-  /*
-  useEffect(() => {
-    fetch(__backendUri__ + '/refresh_token', {
-      method: 'POST',
-      credentials: 'include',
-      headers: headers,
-      mode: 'cors',
-    }).then(async (res) => {
-      const { accessToken } = await res.json();
-      setAccessToken(accessToken);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) {
-    return (
-      <Box>
-        <Heading>Fetching data, please wait...</Heading>
-      </Box>
-    );
-  }
-  */
+  const { data } = useUsersQuery({ fetchPolicy: 'network-only' });
   return (
     <AppLayout>
       <SEO
         title='Home | Todofy'
         description='The coolest Todo App in the web'
       />
+      {data &&
+        data.users.users?.map((user) => {
+          return <Heading key={user.id}>{user.username}</Heading>;
+        })}
     </AppLayout>
   );
 };
 
-export default withApollo({ ssr: true })(Home);
+export default Home;

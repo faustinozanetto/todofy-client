@@ -9,7 +9,6 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { LoginForm } from '../../components/forms/LoginForm';
-import { withApollo } from '../../utils/apollo/withApollo';
 import { SEO } from '../../components/seo';
 
 interface ILogin {}
@@ -71,4 +70,4 @@ const LoginPage: React.FC<ILogin> = ({}) => {
   );
 };
 
-export default withApollo({ ssr: false })(LoginPage);
+export default LoginPage;

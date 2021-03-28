@@ -1,4 +1,3 @@
-import { NextPageContext } from 'next';
 import {
   ApolloClient,
   ApolloLink,
@@ -6,11 +5,12 @@ import {
   InMemoryCache,
   Observable,
 } from '@apollo/client';
-import { createWithApollo } from './createWithApollo';
 import { __backendUri__ } from '../constants';
 import { getAccessToken, setAccessToken } from '../accessToken';
-import jwtDecode from 'jwt-decode';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
+import jwtDecode from 'jwt-decode';
+
+const cache = new InMemoryCache({});
 
 const requestLink = new ApolloLink(
   (operation, forward) =>
@@ -37,56 +37,51 @@ const requestLink = new ApolloLink(
         .catch(observer.error.bind(observer));
 
       return () => {
-        if (handle) {
-          handle.unsubscribe();
-        }
+        if (handle) handle.unsubscribe();
       };
     })
 );
 
-const createClient = (ctx: NextPageContext) =>
-  new ApolloClient({
-    link: ApolloLink.from([
-      new TokenRefreshLink({
-        accessTokenField: 'accessToken',
-        isTokenValidOrUndefined: () => {
-          const token = getAccessToken();
-          if (!token) {
+export const client = new ApolloClient({
+  link: ApolloLink.from([
+    new TokenRefreshLink({
+      accessTokenField: 'accessToken',
+      isTokenValidOrUndefined: () => {
+        const token = getAccessToken();
+        if (!token) {
+          return true;
+        }
+
+        try {
+          const { exp }: any = jwtDecode(token);
+          if (Date.now() >= exp * 1000) {
+            return false;
+          } else {
             return true;
           }
-
-          try {
-            const { exp }: any = jwtDecode(token);
-            if (Date.now() >= exp * 1000) {
-              return false;
-            } else {
-              return true;
-            }
-          } catch (error) {
-            return false;
-          }
-        },
-        fetchAccessToken: () => {
-          return fetch(__backendUri__ + '/refresh_token', {
-            method: 'POST',
-            credentials: 'include',
-          });
-        },
-        handleFetch: (accessToken: string) => {
-          setAccessToken(accessToken);
-        },
-        handleError: (err) => {
-          console.warn('Your refresh token is invalid. Try to re-login');
-          console.error(err);
-        },
-      }),
-      requestLink,
-      new HttpLink({
-        uri: __backendUri__ + '/graphql'!,
-        credentials: 'include',
-      }),
-    ]),
-    cache: new InMemoryCache({}),
-  });
-
-export const withApollo = createWithApollo(createClient);
+        } catch {
+          return false;
+        }
+      },
+      fetchAccessToken: () => {
+        return fetch('http://localhost:4000/refresh_token', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      },
+      handleFetch: (accessToken) => {
+        setAccessToken(accessToken);
+      },
+      handleError: (err) => {
+        console.warn('Your refresh token is invalid. Try to re-login');
+        console.error(err);
+      },
+    }),
+    requestLink,
+    new HttpLink({
+      uri: 'http://localhost:4000/graphql',
+      credentials: 'include',
+    }),
+  ]),
+  cache,
+});
