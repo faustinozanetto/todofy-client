@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import { toErrorMap } from '../../utils';
 import { useLoginMutation, MeQuery, MeDocument } from '../../generated/graphql';
 import { authContext } from '../user/userContext';
+import { setAccessToken } from '../../utils/accessToken';
 
 interface ILoginValues {
   username: string;
@@ -48,19 +49,23 @@ export const LoginForm: React.FC<ILoginForm> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login({
             variables: values,
-            update: (cache, { data }) => {
-              cache.writeQuery<MeQuery>({
+            update: (store, { data }) => {
+              if (!data) {
+                return null;
+              }
+
+              store.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
-                  __typename: 'Query',
-                  me: data?.login.user,
+                  me: data.login.user,
                 },
               });
             },
           });
-          if (response && response?.data?.login?.user && setAuthData) {
+          if (response && response?.data?.login?.accessToken) {
             try {
-              setAuthData(response.data.login.accessToken!);
+              setAccessToken(response.data.login.accessToken);
+              //  setAuthData(response.data.login.accessToken!);
             } catch (error) {
               console.error(error);
             }
