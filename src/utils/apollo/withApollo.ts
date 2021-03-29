@@ -48,6 +48,7 @@ export const client = new ApolloClient({
       accessTokenField: 'accessToken',
       isTokenValidOrUndefined: () => {
         const token = getAccessToken();
+        
         if (!token) {
           return true;
         }
@@ -64,7 +65,7 @@ export const client = new ApolloClient({
         }
       },
       fetchAccessToken: () => {
-        return fetch(__backendUri__ + '/refresh_token', {
+        return fetch(`${__backendUri__}/refresh_token`, {
           method: 'POST',
           credentials: 'include',
         });
@@ -79,7 +80,7 @@ export const client = new ApolloClient({
     }),
     requestLink,
     new HttpLink({
-      uri: __backendUri__ + '/graphql',
+      uri: `${__backendUri__}/graphql`,
       credentials: 'include',
     }),
   ]),

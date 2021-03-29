@@ -19,11 +19,11 @@ const App = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios(`${__backendUri__}/refresh_token`, {
+    fetch('http://localhost:4000/refresh_token', {
       method: 'POST',
-      withCredentials: true,
-    }).then(async (res) => {
-      const { accessToken } = await res.data;
+      credentials: 'include',
+    }).then(async (x) => {
+      const { accessToken } = await x.json();
       setAccessToken(accessToken);
       setLoading(false);
     });
@@ -37,7 +37,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       setLoading(false);
     });
     */
-  }, []);
+  }, [setAccessToken]);
 
   if (loading) {
     return <div>loading...</div>;
