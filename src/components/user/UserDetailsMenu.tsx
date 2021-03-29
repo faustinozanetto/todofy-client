@@ -29,7 +29,7 @@ export const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
   return (
     <>
       <Menu>
-        <MenuButton as={Avatar} src='"https://bit.ly/code-beast"' />
+        <MenuButton as={Avatar} src='' />
         <MenuList>
           <MenuGroup
             fontWeight='500'
@@ -62,7 +62,7 @@ export const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
             icon={FiLogOut}
             onClick={async () => {
               await logout();
-              await apolloClient.clearStore();
+              await apolloClient.resetStore();
               router.reload();
             }}
           />

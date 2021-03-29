@@ -17,16 +17,14 @@ Router.events.on('routeChangeError', () => NProgress.done());
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(true);
-  var headers = new Headers();
-  headers.append('Content-Type', 'application/json');
-  headers.append('Accept', 'application/json');
 
   useEffect(() => {
     fetch(`${__backendUri__}/refresh_token`, {
       method: 'POST',
       credentials: 'include',
-      mode: 'cors',
-      headers: headers,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }).then(async (x) => {
       const { accessToken } = await x.json();
       setAccessToken(accessToken);
@@ -47,5 +45,4 @@ const App = ({ Component, pageProps }: AppProps) => {
     </ApolloProvider>
   );
 };
-
 export default App;

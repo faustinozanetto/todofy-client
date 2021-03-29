@@ -22,7 +22,7 @@ const requestLink = new ApolloLink(
           if (accessToken) {
             operation.setContext({
               headers: {
-                Authorization: `Bearer ${accessToken}`,
+                authorization: `Bearer ${accessToken}`,
               },
             });
           }

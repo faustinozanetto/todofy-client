@@ -7,7 +7,7 @@ export const __prod__: boolean = process.env.NODE_ENV === 'production';
  * @returns Backend URI used in Apollo Client
  */
 export const __backendUri__ = __prod__
-  ? process.env.BACKEND_URI
+  ? 'https://apitodofy.herokuapp.com'
   : 'http://localhost:4000';
 
 /**
