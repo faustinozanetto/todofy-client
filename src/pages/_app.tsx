@@ -19,7 +19,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:4000/refresh_token', {
+    fetch(`${__backendUri__}/refresh_token`, {
       method: 'POST',
       credentials: 'include',
     }).then(async (x) => {
@@ -27,16 +27,6 @@ const App = ({ Component, pageProps }: AppProps) => {
       setAccessToken(accessToken);
       setLoading(false);
     });
-    /*
-    fetch(__backendUri__ + '/refresh_token', {
-      method: 'POST',
-      credentials: 'include',
-    }).then(async (x) => {
-      const { accessToken } = await x.json();
-      setAccessToken(accessToken);
-      setLoading(false);
-    });
-    */
   }, [setAccessToken]);
 
   if (loading) {
