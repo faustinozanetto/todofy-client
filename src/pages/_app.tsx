@@ -7,6 +7,7 @@ import { ApolloProvider } from '@apollo/client';
 import { client } from '../utils/apollo/withApollo';
 import type { AppProps } from 'next/app';
 import { __backendUri__ } from '../utils/constants';
+import axios from 'axios';
 import { setAccessToken } from '../utils/accessToken';
 
 // NProgress event binds
@@ -18,6 +19,15 @@ const App = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    axios(`${__backendUri__}/refresh_token`, {
+      method: 'POST',
+      withCredentials: true,
+    }).then(async (res) => {
+      const { accessToken } = await res.data;
+      setAccessToken(accessToken);
+      setLoading(false);
+    });
+    /*
     fetch(__backendUri__ + '/refresh_token', {
       method: 'POST',
       credentials: 'include',
@@ -26,6 +36,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       setAccessToken(accessToken);
       setLoading(false);
     });
+    */
   }, []);
 
   if (loading) {
