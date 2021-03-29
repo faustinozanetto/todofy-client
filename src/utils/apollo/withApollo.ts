@@ -5,7 +5,7 @@ import {
   InMemoryCache,
   Observable,
 } from '@apollo/client';
-import { __backendUri__ } from '../constants';
+import { __backendUri__, __isServer__ } from '../constants';
 import { getAccessToken, setAccessToken } from '../accessToken';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
 import jwtDecode from 'jwt-decode';
@@ -22,7 +22,7 @@ const requestLink = new ApolloLink(
           if (accessToken) {
             operation.setContext({
               headers: {
-                authorization: `bearer ${accessToken}`,
+                Authorization: `Bearer ${accessToken}`,
               },
             });
           }
@@ -84,6 +84,8 @@ export const client = new ApolloClient({
       credentials: 'include',
     }),
   ]),
+  connectToDevTools: !__isServer__,
+  ssrMode: __isServer__,
   cache,
   credentials: 'include',
 });
