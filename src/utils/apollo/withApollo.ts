@@ -48,7 +48,7 @@ export const client = new ApolloClient({
       accessTokenField: 'accessToken',
       isTokenValidOrUndefined: () => {
         const token = getAccessToken();
-        
+
         if (!token) {
           return true;
         }
@@ -85,4 +85,5 @@ export const client = new ApolloClient({
     }),
   ]),
   cache,
+  credentials: 'include',
 });
