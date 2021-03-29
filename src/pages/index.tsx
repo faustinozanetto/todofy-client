@@ -4,6 +4,7 @@ import { SEO } from '../components/seo';
 import { useUsersQuery } from '../generated/graphql';
 import { AppLayout } from '../layout';
 import { __backendUri__, __isServer__ } from '../utils/constants';
+import { withApollo } from '../utils/apollo/withApollo';
 
 const Home = () => {
   const { data } = useUsersQuery({ fetchPolicy: 'network-only' });
@@ -21,4 +22,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withApollo({ ssr: true })(Home);

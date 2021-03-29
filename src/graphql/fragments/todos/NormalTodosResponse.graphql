@@ -1,0 +1,9 @@
+fragment NormalTodosResponse on TodosResponse {
+  errors {
+    ...NormalError
+  }
+  todos {
+    ...NormalTodo
+  }
+  hasMore
+}

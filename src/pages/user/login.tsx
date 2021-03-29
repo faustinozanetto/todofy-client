@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { LoginForm } from '../../components/forms/LoginForm';
 import { SEO } from '../../components/seo';
+import { withApollo } from '../../utils/apollo/withApollo';
 
 interface ILogin {}
 
@@ -70,4 +71,4 @@ const LoginPage: React.FC<ILogin> = ({}) => {
   );
 };
 
-export default LoginPage;
+export default withApollo({ ssr: false })(LoginPage);

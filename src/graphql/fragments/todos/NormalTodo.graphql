@@ -1,0 +1,9 @@
+fragment NormalTodo on Todo {
+  id
+  title
+  description
+  completed
+  creatorId
+  createdAt
+  updatedAt
+}

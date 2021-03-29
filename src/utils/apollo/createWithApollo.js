@@ -185,8 +185,10 @@ export const createWithApollo = (ac) => {
 function createApolloClient(apolloClient, initialState, ctx) {
   // The `ctx` (NextPageContext) will only be present on the server.
   // use it to extract auth headers (ctx.req) or similar.
-  apolloClient.ssrMode = Boolean(ctx);
-  apolloClient.cache.restore(initialState);
+  if (apolloClient) {
+    apolloClient.ssrMode = Boolean(ctx);
+    apolloClient.cache.restore(initialState);
+  }
 
   return apolloClient;
 }

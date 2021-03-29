@@ -1,0 +1,6 @@
+fragment NormalTodoDeleteResponse on TodoDeleteResponse {
+  errors {
+    ...NormalError
+  }
+  deleted
+}

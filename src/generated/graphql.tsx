@@ -69,7 +69,8 @@ export type Query = {
 
 
 export type QueryUserTodosArgs = {
-  id: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
 };
 
 
@@ -83,6 +84,8 @@ export type Todo = {
   title: Scalars['String'];
   description: Scalars['String'];
   completed: Scalars['Boolean'];
+  creatorId: Scalars['Int'];
+  creator: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
 };
@@ -91,7 +94,6 @@ export type TodoCreateInput = {
   title: Scalars['String'];
   description: Scalars['String'];
   completed: Scalars['Boolean'];
-  user: Scalars['Int'];
 };
 
 export type TodoDeleteInput = {
@@ -113,7 +115,8 @@ export type TodoResponse = {
 export type TodosResponse = {
   __typename?: 'TodosResponse';
   errors?: Maybe<Array<FieldError>>;
-  todos?: Maybe<Array<Todo>>;
+  todos: Array<Todo>;
+  hasMore: Scalars['Boolean'];
 };
 
 export type User = {
@@ -144,6 +147,37 @@ export type UsersResponse = {
   users?: Maybe<Array<User>>;
 };
 
+export type NormalErrorFragment = (
+  { __typename?: 'FieldError' }
+  & Pick<FieldError, 'field' | 'message'>
+);
+
+export type NormalTodoFragment = (
+  { __typename?: 'Todo' }
+  & Pick<Todo, 'id' | 'title' | 'description' | 'completed' | 'creatorId' | 'createdAt' | 'updatedAt'>
+);
+
+export type NormalTodoDeleteResponseFragment = (
+  { __typename?: 'TodoDeleteResponse' }
+  & Pick<TodoDeleteResponse, 'deleted'>
+  & { errors?: Maybe<Array<(
+    { __typename?: 'FieldError' }
+    & NormalErrorFragment
+  )>> }
+);
+
+export type NormalTodosResponseFragment = (
+  { __typename?: 'TodosResponse' }
+  & Pick<TodosResponse, 'hasMore'>
+  & { errors?: Maybe<Array<(
+    { __typename?: 'FieldError' }
+    & NormalErrorFragment
+  )>>, todos: Array<(
+    { __typename?: 'Todo' }
+    & NormalTodoFragment
+  )> }
+);
+
 export type NormalUserFragment = (
   { __typename?: 'User' }
   & Pick<User, 'id' | 'username' | 'email'>
@@ -172,9 +206,17 @@ export type NormalUsersResponseFragment = (
   )>> }
 );
 
-export type NormalErrorFragment = (
-  { __typename?: 'FieldError' }
-  & Pick<FieldError, 'field' | 'message'>
+export type DeleteTodoMutationVariables = Exact<{
+  input: TodoDeleteInput;
+}>;
+
+
+export type DeleteTodoMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteTodo: (
+    { __typename?: 'TodoDeleteResponse' }
+    & NormalTodoDeleteResponseFragment
+  ) }
 );
 
 export type LoginMutationVariables = Exact<{
@@ -231,6 +273,20 @@ export type MeQuery = (
   )> }
 );
 
+export type UserTodosQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
+
+
+export type UserTodosQuery = (
+  { __typename?: 'Query' }
+  & { userTodos: (
+    { __typename?: 'TodosResponse' }
+    & NormalTodosResponseFragment
+  ) }
+);
+
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -248,6 +304,37 @@ export const NormalErrorFragmentDoc = gql`
   message
 }
     `;
+export const NormalTodoDeleteResponseFragmentDoc = gql`
+    fragment NormalTodoDeleteResponse on TodoDeleteResponse {
+  errors {
+    ...NormalError
+  }
+  deleted
+}
+    ${NormalErrorFragmentDoc}`;
+export const NormalTodoFragmentDoc = gql`
+    fragment NormalTodo on Todo {
+  id
+  title
+  description
+  completed
+  creatorId
+  createdAt
+  updatedAt
+}
+    `;
+export const NormalTodosResponseFragmentDoc = gql`
+    fragment NormalTodosResponse on TodosResponse {
+  errors {
+    ...NormalError
+  }
+  todos {
+    ...NormalTodo
+  }
+  hasMore
+}
+    ${NormalErrorFragmentDoc}
+${NormalTodoFragmentDoc}`;
 export const NormalUserFragmentDoc = gql`
     fragment NormalUser on User {
   id
@@ -278,6 +365,39 @@ export const NormalUsersResponseFragmentDoc = gql`
 }
     ${NormalErrorFragmentDoc}
 ${NormalUserFragmentDoc}`;
+export const DeleteTodoDocument = gql`
+    mutation deleteTodo($input: TodoDeleteInput!) {
+  deleteTodo(input: $input) {
+    ...NormalTodoDeleteResponse
+  }
+}
+    ${NormalTodoDeleteResponseFragmentDoc}`;
+export type DeleteTodoMutationFn = Apollo.MutationFunction<DeleteTodoMutation, DeleteTodoMutationVariables>;
+
+/**
+ * __useDeleteTodoMutation__
+ *
+ * To run a mutation, you first call `useDeleteTodoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteTodoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteTodoMutation, { data, loading, error }] = useDeleteTodoMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteTodoMutation(baseOptions?: Apollo.MutationHookOptions<DeleteTodoMutation, DeleteTodoMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteTodoMutation, DeleteTodoMutationVariables>(DeleteTodoDocument, options);
+      }
+export type DeleteTodoMutationHookResult = ReturnType<typeof useDeleteTodoMutation>;
+export type DeleteTodoMutationResult = Apollo.MutationResult<DeleteTodoMutation>;
+export type DeleteTodoMutationOptions = Apollo.BaseMutationOptions<DeleteTodoMutation, DeleteTodoMutationVariables>;
 export const LoginDocument = gql`
     mutation login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
@@ -441,6 +561,42 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const UserTodosDocument = gql`
+    query userTodos($limit: Int!, $cursor: String) {
+  userTodos(limit: $limit, cursor: $cursor) {
+    ...NormalTodosResponse
+  }
+}
+    ${NormalTodosResponseFragmentDoc}`;
+
+/**
+ * __useUserTodosQuery__
+ *
+ * To run a query within a React component, call `useUserTodosQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserTodosQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserTodosQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useUserTodosQuery(baseOptions: Apollo.QueryHookOptions<UserTodosQuery, UserTodosQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserTodosQuery, UserTodosQueryVariables>(UserTodosDocument, options);
+      }
+export function useUserTodosLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserTodosQuery, UserTodosQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserTodosQuery, UserTodosQueryVariables>(UserTodosDocument, options);
+        }
+export type UserTodosQueryHookResult = ReturnType<typeof useUserTodosQuery>;
+export type UserTodosLazyQueryHookResult = ReturnType<typeof useUserTodosLazyQuery>;
+export type UserTodosQueryResult = Apollo.QueryResult<UserTodosQuery, UserTodosQueryVariables>;
 export const UsersDocument = gql`
     query users {
   users {

@@ -9,6 +9,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { RegisterForm } from '../../components/forms/RegisterForm';
+import { withApollo } from '../../utils/apollo/withApollo';
 
 interface IRegister {}
 
@@ -55,4 +56,4 @@ const RegisterPage: React.FC<IRegister> = ({}) => {
   );
 };
 
-export default RegisterPage;
+export default withApollo({ ssr: false })(RegisterPage);

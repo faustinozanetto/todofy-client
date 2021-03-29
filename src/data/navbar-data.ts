@@ -6,4 +6,9 @@ export const NAVBAR_LINKS: Array<INavbarLink> = [
     href: '/',
     tooltip: 'Goto home',
   },
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    tooltip: 'Goto dashboard',
+  },
 ];

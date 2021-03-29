@@ -8,9 +8,10 @@ import {
 import { __backendUri__, __isServer__ } from '../constants';
 import { getAccessToken, setAccessToken } from '../accessToken';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
+import { createWithApollo } from './createWithApollo';
+import { TodosResponse } from '../../generated/graphql';
 import jwtDecode from 'jwt-decode';
-
-const cache = new InMemoryCache({});
+import { NextPageContext } from 'next';
 
 const requestLink = new ApolloLink(
   (operation, forward) =>
@@ -42,55 +43,75 @@ const requestLink = new ApolloLink(
     })
 );
 
-export const client = new ApolloClient({
-  link: ApolloLink.from([
-    new TokenRefreshLink({
-      accessTokenField: 'accessToken',
-      isTokenValidOrUndefined: () => {
-        const token = getAccessToken();
+const createClient = (_ctx: NextPageContext) =>
+  new ApolloClient({
+    uri: __backendUri__ as string,
+    link: ApolloLink.from([
+      new TokenRefreshLink({
+        accessTokenField: 'accessToken',
+        isTokenValidOrUndefined: () => {
+          const token = getAccessToken();
 
-        if (!token) {
-          return true;
-        }
-
-        try {
-          const { exp }: any = jwtDecode(token);
-          if (Date.now() >= exp * 1000) {
-            return false;
-          } else {
+          if (!token) {
             return true;
           }
-        } catch {
-          return false;
-        }
-      },
-      fetchAccessToken: () => {
-        return fetch(`${__backendUri__}/refresh_token`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
+
+          try {
+            const { exp }: any = jwtDecode(token);
+            if (Date.now() >= exp * 1000) {
+              return false;
+            } else {
+              return true;
+            }
+          } catch {
+            return false;
+          }
+        },
+        fetchAccessToken: () => {
+          return fetch(`${__backendUri__}/refresh_token`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+            },
+          });
+        },
+        handleFetch: (accessToken) => {
+          const accessTokenDecrypted = jwtDecode(accessToken);
+          setAccessToken(accessToken);
+          console.log('Decrypted access token: ', accessTokenDecrypted);
+        },
+        handleError: (err) => {
+          console.warn('Your refresh token is invalid. Try to re-login');
+          console.error(err);
+        },
+      }),
+      requestLink,
+      new HttpLink({
+        uri: `${__backendUri__}/graphql`,
+        credentials: 'include',
+      }),
+    ]),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            userTodos: {
+              keyArgs: [],
+              merge(
+                existing: TodosResponse | undefined,
+                incoming: TodosResponse
+              ): TodosResponse {
+                return {
+                  ...incoming,
+                  todos: [...(existing?.todos || []), ...incoming.todos],
+                };
+              },
+            },
           },
-        });
-      },
-      handleFetch: (accessToken) => {
-        const accessTokenDecrypted = jwtDecode(accessToken);
-        setAccessToken(accessToken);
-        console.log('Decrypted access token: ', accessTokenDecrypted);
-      },
-      handleError: (err) => {
-        console.warn('Your refresh token is invalid. Try to re-login');
-        console.error(err);
+        },
       },
     }),
-    requestLink,
-    new HttpLink({
-      uri: `${__backendUri__}/graphql`,
-      credentials: 'include',
-    }),
-  ]),
-  connectToDevTools: !__isServer__,
-  ssrMode: __isServer__,
-  cache,
-  credentials: 'include',
-});
+    credentials: 'include',
+  });
+export const withApollo = createWithApollo(createClient);

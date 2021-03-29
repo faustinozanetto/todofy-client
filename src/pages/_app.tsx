@@ -3,11 +3,8 @@ import NProgress from 'nprogress';
 import { ChakraProvider, CSSReset } from '@chakra-ui/react';
 import { theme } from '../styles';
 import { Router } from 'next/router';
-import { ApolloProvider } from '@apollo/client';
-import { client } from '../utils/apollo/withApollo';
 import type { AppProps } from 'next/app';
 import { __backendUri__ } from '../utils/constants';
-import axios from 'axios';
 import { setAccessToken } from '../utils/accessToken';
 
 // NProgress event binds
@@ -37,12 +34,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   }
 
   return (
-    <ApolloProvider client={client}>
-      <ChakraProvider theme={theme}>
-        <CSSReset />
-        <Component {...pageProps} />
-      </ChakraProvider>
-    </ApolloProvider>
+    <ChakraProvider theme={theme}>
+      <CSSReset />
+      <Component {...pageProps} />
+    </ChakraProvider>
   );
 };
 export default App;

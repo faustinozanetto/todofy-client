@@ -1,0 +1,5 @@
+query userTodos($limit: Int!, $cursor: String) {
+  userTodos(limit: $limit, cursor: $cursor) {
+    ...NormalTodosResponse
+  }
+}

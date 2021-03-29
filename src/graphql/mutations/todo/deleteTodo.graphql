@@ -1,0 +1,5 @@
+mutation deleteTodo($input: TodoDeleteInput!) {
+  deleteTodo(input: $input) {
+    ...NormalTodoDeleteResponse
+  }
+}
