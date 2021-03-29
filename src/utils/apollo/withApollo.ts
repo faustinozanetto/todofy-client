@@ -68,10 +68,15 @@ export const client = new ApolloClient({
         return fetch(`${__backendUri__}/refresh_token`, {
           method: 'POST',
           credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+          },
         });
       },
       handleFetch: (accessToken) => {
+        const accessTokenDecrypted = jwtDecode(accessToken);
         setAccessToken(accessToken);
+        console.log('Decrypted access token: ', accessTokenDecrypted);
       },
       handleError: (err) => {
         console.warn('Your refresh token is invalid. Try to re-login');
