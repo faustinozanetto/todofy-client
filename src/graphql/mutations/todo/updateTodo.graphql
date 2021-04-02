@@ -1,0 +1,15 @@
+mutation updateTodo(
+  $id: Int!
+  $title: String!
+  $description: String!
+  $completed: Boolean!
+) {
+  updateTodo(
+    id: $id
+    title: $title
+    description: $description
+    completed: $completed
+  ) {
+    ...NormalTodoResponse
+  }
+}

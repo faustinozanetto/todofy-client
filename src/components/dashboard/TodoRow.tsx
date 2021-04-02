@@ -1,7 +1,8 @@
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
-import { Tr, Td, HStack, IconButton, Heading } from '@chakra-ui/react';
-import React from 'react';
-import { NormalTodoFragment } from '../../generated/graphql';
+import React from 'react'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { Heading, HStack, IconButton, Td, Tr } from '@chakra-ui/react'
+
+import { NormalTodoFragment } from '../../generated/graphql'
 
 interface TodoRowProps {
   todo?: NormalTodoFragment;

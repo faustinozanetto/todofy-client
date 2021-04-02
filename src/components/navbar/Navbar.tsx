@@ -1,22 +1,14 @@
-import React, { ReactNode } from 'react';
-import {
-  Box,
-  Flex,
-  Container,
-  useColorModeValue,
-  useDisclosure,
-  HStack,
-  Button,
-  Heading,
-} from '@chakra-ui/react';
-import { NavbarLink, ThemeTogglerButton } from '.';
-import { NavbarLogo } from './NavbarLogo';
-import { NavbarHamburgerButton } from './NavbarHamburgerButton';
-import { NAVBAR_LINKS } from '../../data';
-import { useRouter } from 'next/router';
-import { __isServer__ } from '../../utils/constants';
-import { useMeQuery } from '../../generated/graphql';
-import { UserDetailsMenu } from '../user';
+import React, { ReactNode } from 'react'
+import { Box, Button, Container, Flex, Heading, HStack, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+
+import { NavbarLink, ThemeTogglerButton } from '.'
+import { NavbarLogo } from './NavbarLogo'
+import { NavbarHamburgerButton } from './NavbarHamburgerButton'
+import { NAVBAR_LINKS } from '../../data'
+import { __isServer__ } from '../../utils/constants'
+import { useMeQuery } from '../../generated/graphql'
+import { UserDetailsMenu } from '../user'
 
 interface NavbarProps {}
 
@@ -31,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   let userContent: ReactNode = null;
 
   if (loading) {
-    userContent = <Heading>Loading...</Heading>;
+    userContent = <Heading fontSize='md'>Loading...</Heading>;
   } else if (userData && userData.me) {
     userContent = <UserDetailsMenu userData={userData} />;
   } else {
@@ -111,9 +103,11 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           </Flex>
 
           {/* Theme Toggle Button */}
-          <Flex>
-            <ThemeTogglerButton />
-          </Flex>
+          {!userData?.me && !loading ? (
+            <Flex>
+              <ThemeTogglerButton />
+            </Flex>
+          ) : null}
         </Container>
       </Flex>
     </Box>

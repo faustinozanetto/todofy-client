@@ -1,14 +1,15 @@
-import React, { useContext } from 'react';
-import { Formik, FormikProps, Form } from 'formik';
-import * as Yup from 'yup';
-import { Box, Spacer, Stack } from '@chakra-ui/layout';
-import { FormField } from './FormField';
-import { Button, useToast } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
-import { toErrorMap } from '../../utils';
-import { useLoginMutation, MeQuery, MeDocument } from '../../generated/graphql';
-import { authContext } from '../user/userContext';
-import { setAccessToken } from '../../utils/accessToken';
+import * as Yup from 'yup'
+import React, { useContext } from 'react'
+import { Form, Formik, FormikProps } from 'formik'
+import { Box, Spacer, Stack } from '@chakra-ui/layout'
+import { Button, useToast } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+
+import { FormField } from '../FormField'
+import { toErrorMap } from '../../../utils'
+import { MeDocument, MeQuery, useLoginMutation } from '../../../generated/graphql'
+import { authContext } from '../../user/userContext'
+import { setAccessToken } from '../../../utils/accessToken'
 
 interface ILoginValues {
   username: string;

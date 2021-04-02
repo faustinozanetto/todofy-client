@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppLayout } from '../../layout/AppLayout';
 import { SEO } from '../../components/seo';
 import { Dashboard } from '../../components/dashboard';

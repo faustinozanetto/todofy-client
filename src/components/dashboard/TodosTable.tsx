@@ -1,36 +1,33 @@
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
-import {
-  IconButton,
-  HStack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  useDisclosure,
-  useToast,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { useDeleteTodoMutation, UserTodosQuery } from '../../generated/graphql';
-import { ConfirmTodoDelete } from './ConfirmTodoDelete';
-import { TodoRow } from './TodoRow';
+import React, { useState } from 'react'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { HStack, IconButton, Table, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+
+import { useDeleteTodoMutation, UserTodosQuery } from '../../generated/graphql'
+import { ConfirmTodoDelete } from './ConfirmTodoDelete'
+import { TodoRow } from './TodoRow'
+import { TodoEditModal } from './TodoEditModal'
 
 interface ITodosTable {
   todos?: UserTodosQuery;
 }
 
 export const TodosTable: React.FC<ITodosTable> = ({ todos }) => {
-  const { isOpen, onOpen: onOpenDeleteConfirm, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenDelete,
+    onOpen: onOpenDeleteConfirm,
+    onClose: onCloseDelete,
+  } = useDisclosure();
+
   const [currentTodoID, setCurrentTodoID] = useState<number>(0);
   const [deleteTodo] = useDeleteTodoMutation();
   const toast = useToast();
+  const router = useRouter();
 
   const confirmTodoDelete = async () => {
     const response = await deleteTodo({
       variables: { input: { id: currentTodoID } },
       update: (cache) => {
-        // Post:77
         cache.evict({ id: 'Todo:' + currentTodoID });
       },
     });
@@ -52,17 +49,18 @@ export const TodosTable: React.FC<ITodosTable> = ({ todos }) => {
         isClosable: true,
       });
     }
-    onClose();
+    onCloseDelete();
   };
   return (
     <>
       <ConfirmTodoDelete
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isOpenDelete}
+        onClose={onCloseDelete}
         onConfirmDelete={() => {
           confirmTodoDelete();
         }}
       />
+
       <Table variant='simple' size='lg' colorScheme='linkedin'>
         <Thead>
           <Tr>
@@ -80,7 +78,7 @@ export const TodosTable: React.FC<ITodosTable> = ({ todos }) => {
                   key={todo.id}
                   todo={todo}
                   onEdit={() => {
-                    setCurrentTodoID(todo.id);
+                    router.push(`/todo/edit/${todo.id}`);
                   }}
                   onDelete={async () => {
                     setCurrentTodoID(todo.id);

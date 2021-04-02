@@ -1,16 +1,10 @@
-import React from 'react';
-import { AppLayout } from '../../layout/AppLayout';
-import {
-  Box,
-  Heading,
-  VStack,
-  Text,
-  Stack,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { LoginForm } from '../../components/forms/LoginForm';
-import { SEO } from '../../components/seo';
-import { withApollo } from '../../utils/apollo/withApollo';
+import React from 'react'
+import { Box, Heading, Stack, Text, useColorModeValue, VStack } from '@chakra-ui/react'
+
+import { AppLayout } from '../../layout/AppLayout'
+import { LoginForm } from '../../components/forms/user/LoginForm'
+import { SEO } from '../../components/seo'
+import { withApollo } from '../../utils/apollo/withApollo'
 
 interface ILogin {}
 

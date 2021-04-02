@@ -1,0 +1,8 @@
+fragment NormalTodoResponse on TodoResponse {
+  errors {
+    ...NormalError
+  }
+  todo {
+    ...NormalTodo
+  }
+}

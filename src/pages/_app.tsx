@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import NProgress from 'nprogress';
-import { ChakraProvider, CSSReset } from '@chakra-ui/react';
-import { theme } from '../styles';
-import { Router } from 'next/router';
-import type { AppProps } from 'next/app';
-import { __backendUri__ } from '../utils/constants';
-import { setAccessToken } from '../utils/accessToken';
+import NProgress from 'nprogress'
+import React, { useEffect, useState } from 'react'
+import { Box, ChakraProvider, CSSReset, Heading } from '@chakra-ui/react'
+import { Router } from 'next/router'
 
+import { theme } from '../styles'
+import { __backendUri__ } from '../utils/constants'
+import { setAccessToken } from '../utils/accessToken'
+
+import type { AppProps } from 'next/app';
 // NProgress event binds
 Router.events.on('routeChangeStart', () => NProgress.start());
 Router.events.on('routeChangeComplete', () => NProgress.done());
@@ -22,21 +23,23 @@ const App = ({ Component, pageProps }: AppProps) => {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then(async (x) => {
-      const { accessToken } = await x.json();
-      setAccessToken(accessToken);
+    }).then(async (res) => {
+      const data = await res.json();
+      setAccessToken(data.accessToken);
       setLoading(false);
     });
   }, [setAccessToken]);
 
-  if (loading) {
-    return <div>loading...</div>;
-  }
-
   return (
     <ChakraProvider theme={theme}>
       <CSSReset />
-      <Component {...pageProps} />
+      {loading ? (
+        <Box>
+          <Heading>Loading</Heading>
+        </Box>
+      ) : (
+        <Component {...pageProps} />
+      )}
     </ChakraProvider>
   );
 };

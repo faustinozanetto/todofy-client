@@ -1,0 +1,5 @@
+query todo($id: Int!) {
+  todo(id: $id) {
+    ...NormalTodoResponse
+  }
+}

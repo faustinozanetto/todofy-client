@@ -1,14 +1,8 @@
-import React from 'react';
-import { AppLayout } from '../../layout/AppLayout';
-import {
-  Box,
-  Heading,
-  VStack,
-  Text,
-  Stack,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { ForgotPasswordForm } from '../../components/forms';
+import React from 'react'
+import { Box, Heading, Stack, Text, useColorModeValue, VStack } from '@chakra-ui/react'
+
+import { AppLayout } from '../../layout/AppLayout'
+import { ForgotPasswordForm } from '../../components/forms/user'
 
 interface IForgotPassword {}
 

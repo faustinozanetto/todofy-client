@@ -1,14 +1,9 @@
-import React from 'react';
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Heading,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { useUserTodosQuery } from '../../generated/graphql';
-import { TodosTable } from '.';
+import React from 'react'
+import { Box, Button, Container, Flex, Heading, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+
+import { useUserTodosQuery } from '../../generated/graphql'
+import { TodosTable } from '.'
 
 interface DashboardProps {}
 
@@ -17,64 +12,107 @@ export const Dashboard: React.FC<DashboardProps> = ({}) => {
     variables: { limit: 10, cursor: null },
     notifyOnNetworkStatusChange: true,
   });
-
-  if (!loading && !data) {
-    return (
-      <div>
-        <div>you got query failed for some reason</div>
-        <div>{error?.message}</div>
-      </div>
-    );
-  }
+  const router = useRouter();
 
   return (
-    <Container maxWidth='5xl'>
-      <Box
-        backgroundColor={useColorModeValue('#F7FAFC', '#1A202C')}
-        borderRadius='lg'
-        alignContent='center'
-        justifyContent='center'
-        boxShadow='lg'
-      >
-        <Flex flexDirection='column'>
-          {!data && loading ? (
-            <div>loading...</div>
-          ) : (
-            <>
-              <Box p={4} width='100%' mx='auto'>
-                <Heading textAlign='center'>Dashboard</Heading>
-              </Box>
-
-              <Box p={4} width='100%' mx='auto'>
-                <TodosTable todos={data} />
-                {error ? error.message : null}
-              </Box>
-            </>
-          )}
-          {data && data.userTodos.hasMore ? (
-            <Box display='flex' p={4} width='100%' mx='auto'>
+    <>
+      {!loading && error ? (
+        <Container maxWidth='lg'>
+          <Box
+            display='flex'
+            alignContent='center'
+            borderRadius='md'
+            backgroundColor={useColorModeValue('#F7FAFC', '#1A202C')}
+            maxWidth='100vh'
+            p={4}
+          >
+            <Stack direction='column' mx='auto'>
+              <Heading textAlign='center'>An error occurred!</Heading>
+              <Text fontSize='lg' textAlign='center'>
+                {error.message}
+              </Text>
               <Button
-                onClick={() => {
-                  fetchMore({
-                    variables: {
-                      limit: variables?.limit,
-                      cursor:
-                        data.userTodos.todos[data.userTodos.todos.length - 1]
-                          .createdAt,
-                    },
-                  });
-                }}
-                m={2}
-                mx='auto'
+                variant='outline'
+                width='50%'
+                alignSelf='center'
                 colorScheme='facebook'
-                isLoading={loading}
+                margin={6}
+                onClick={() => router.push('/')}
               >
-                Load More
+                Go Back
               </Button>
-            </Box>
-          ) : null}
-        </Flex>
-      </Box>
-    </Container>
+            </Stack>
+          </Box>
+        </Container>
+      ) : (
+        <>
+          {!data?.userTodos && loading ? (
+            <Container maxWidth='lg'>
+              <Box
+                display='flex'
+                alignContent='center'
+                borderRadius='md'
+                backgroundColor={useColorModeValue('#F7FAFC', '#1A202C')}
+                maxWidth='100vh'
+                p={4}
+              >
+                <Stack direction='column' mx='auto'>
+                  <Heading textAlign='center'>Loading content...</Heading>
+                  <Text fontSize='lg' textAlign='center'>
+                    Please wait :)
+                  </Text>
+                </Stack>
+              </Box>
+            </Container>
+          ) : (
+            <Container maxWidth='5xl'>
+              <Box
+                backgroundColor={useColorModeValue('#F7FAFC', '#1A202C')}
+                borderRadius='lg'
+                alignContent='center'
+                justifyContent='center'
+                boxShadow='lg'
+              >
+                <Flex flexDirection='column'>
+                  <>
+                    <Box p={4} width='100%' mx='auto'>
+                      <Heading textAlign='center'>Dashboard</Heading>
+                    </Box>
+
+                    <Box p={4} width='100%' mx='auto'>
+                      <TodosTable todos={data} />
+                    </Box>
+                  </>
+
+                  {data && data.userTodos.hasMore ? (
+                    <Box display='flex' p={4} width='100%' mx='auto'>
+                      <Button
+                        onClick={() => {
+                          fetchMore({
+                            variables: {
+                              limit: variables?.limit,
+                              cursor:
+                                data.userTodos.todos[
+                                  data.userTodos.todos.length - 1
+                                ].createdAt,
+                            },
+                          });
+                        }}
+                        m={2}
+                        mx='auto'
+                        colorScheme='facebook'
+                        isLoading={loading}
+                      >
+                        Load More
+                      </Button>
+                    </Box>
+                  ) : null}
+                </Flex>
+              </Box>
+            </Container>
+          )}
+        </>
+      )}
+    </>
   );
 };

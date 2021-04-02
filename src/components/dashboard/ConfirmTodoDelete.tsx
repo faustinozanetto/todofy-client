@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -8,8 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  useDisclosure,
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 
 interface IConfirmTodoDelete {
   isOpen: boolean;

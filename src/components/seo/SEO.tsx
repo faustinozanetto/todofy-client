@@ -12,6 +12,7 @@ export const SEO: React.FC<SEOProps> = ({ title, description }) => {
       <meta charSet='utf-8' />
       <title>{title}</title>
       <meta name='description' content={description} />
+      <link rel='icon' type='image/vnd.microsoft.icon' href='favicon.ico' />
     </Head>
   );
 };
