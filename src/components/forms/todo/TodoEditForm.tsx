@@ -1,14 +1,17 @@
-import * as Yup from 'yup'
-import React from 'react'
-import { Form, Formik, FormikProps } from 'formik'
-import { Box, Stack } from '@chakra-ui/layout'
-import { Button, useToast } from '@chakra-ui/react'
-import { route } from 'next/dist/next-server/server/router'
-import { useRouter } from 'next/router'
+import * as Yup from 'yup';
+import React from 'react';
+import { Form, Formik, FormikProps } from 'formik';
+import { Box, Stack } from '@chakra-ui/layout';
+import { Button, useToast } from '@chakra-ui/react';
+import { route } from 'next/dist/next-server/server/router';
+import { useRouter } from 'next/router';
 
-import { FormField, SwitchField } from '../index'
-import { toErrorMap } from '../../../utils'
-import { NormalTodoFragment, useUpdateTodoMutation } from '../../../generated/graphql'
+import { FormField, SwitchField } from '../index';
+import { toErrorMap } from '../../../utils';
+import {
+  NormalTodoFragment,
+  useUpdateTodoMutation,
+} from '../../../generated/graphql';
 
 interface ITodoEditValues {
   title: string;
@@ -63,7 +66,7 @@ export const TodoEditForm: React.FC<ITodoEdit> = ({ todo }) => {
               completed: values.completed,
             },
           });
-          console.log(response);
+          console.log(values);
 
           const errors = response?.data?.updateTodo?.errors!;
           if (errors) {

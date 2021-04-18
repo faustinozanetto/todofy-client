@@ -11,7 +11,9 @@ export const AppLayout: React.FC<IAppLayout> = ({ children }) => {
   return (
     <>
       <Navbar />
-      <Box my={8}>{children}</Box>
+      <Box my={8} minHeight='100vh'>
+        {children}
+      </Box>
       <Footer />
     </>
   );

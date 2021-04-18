@@ -42,7 +42,7 @@ const requestLink = new ApolloLink(
       };
     })
 );
-
+    
 const createClient = (_ctx: NextPageContext) =>
   new ApolloClient({
     uri: __backendUri__ as string,
